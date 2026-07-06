@@ -1,0 +1,143 @@
+/* =====================================================
+   HMS NEXT.JS STYLE.CSS
+   Generated for Login, Register, Patient Dashboard,
+   Doctor Dashboard, Book Appointment, Reports
+   ===================================================== */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,Helvetica,sans-serif;
+}
+body{
+  background:#f4f7fb;
+  color:#222;
+}
+h1,h2,h3{color:#0b4f8a}
+button{
+  background:#0b4f8a;
+  color:#fff;
+  border:none;
+  padding:12px 20px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:.3s;
+}
+button:hover{background:#083c69}
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin:10px 0;
+}
+#login-form{
+  max-width:450px;
+  margin:60px auto;
+  background:#fff;
+  padding:35px;
+  border-radius:12px;
+  box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
+.form-login{display:flex;flex-direction:column}
+#message{color:#c00;margin-top:10px}
+.patient-model{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:40px;
+  padding:40px 20px;
+}
+#patient-model,#doctor-model,#admin-model{
+  width:100%;
+  max-width:900px;
+  background:#fff;
+  border-radius:12px;
+  padding:30px;
+  box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+.p-hed,.d-hed,.a-hed{text-align:center;margin-bottom:25px}
+.pa-mo-content,.do-mo-content,.a-mo-content{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+#p-model-btn,#d-model-btn,#a-model-btn{
+  padding:20px;
+  font-size:18px;
+}
+#book{text-align:center;padding:20px}
+.img-b{
+  width:100%;
+  max-width:900px;
+  border-radius:12px;
+}
+#book-appointment{
+  max-width:700px;
+  margin:30px auto;
+  background:#fff;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 5px 18px rgba(0,0,0,.1);
+}
+.book-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+.book-form label{
+  grid-column:1/-1;
+  font-weight:bold;
+}
+.book-form button{
+  grid-column:1/-1;
+}
+.table-container{
+  width:95%;
+  margin:40px auto;
+  overflow:auto;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 5px 18px rgba(0,0,0,.1);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th{
+  background:#0b4f8a;
+  color:#fff;
+}
+th,td{
+  padding:14px;
+  border:1px solid #ddd;
+  text-align:center;
+}
+td button{
+  margin:4px;
+}
+#reports-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+  margin-top:25px;
+}
+.card{
+  background:#fff;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.card h3{margin-bottom:10px}
+.card p{margin:8px 0}
+@media(max-width:768px){
+  .book-form{grid-template-columns:1fr}
+  .pa-mo-content,.do-mo-content,.a-mo-content{
+    grid-template-columns:1fr;
+  }
+  th,td{
+    font-size:14px;
+    padding:10px;
+  }
+}
