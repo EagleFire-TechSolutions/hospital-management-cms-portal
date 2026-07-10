@@ -46,7 +46,7 @@ import { patientrouter }  from "./routes/patients.routes.js";
 import appointmentrouter from "./routes/appointment.routes.js";
 import { reportsrouter } from "./routes/appointment.routes.js";
 import { doctorrouter } from "./routes/doctors.routes.js";
-
+import path from "path";
 
 
 app.use("/api/patient",patientrouter);
@@ -54,5 +54,6 @@ app.use("/api/reports",reportsrouter);
 app.use("/api/appointment",appointmentrouter);
 app.use("/api/appointments",doctorrouter);
 app.use("/api/doctors" , doctorrouter);
+app.use("/uploads", express.static("uploads"));
 
 export {app};

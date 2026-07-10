@@ -56,53 +56,8 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* Doctor Dashboard */}
-
-      <div id="doctor-model">
-        <div className="do-mo-content">
-
-          <div className="d-hed">
-            <h2>Welcome to Your Dashboard</h2>
-          </div>
-
-          <button id="d-model-btn">
-            Book Appointment
-          </button>
-
-          <button id="d-model-btn">
-            My Appointments
-          </button>
-
-          <button id="d-model-btn">
-            Medical Reports
-          </button>
-
-        </div>
-      </div>
-
-      {/* Admin Dashboard */}
-
-      <div id="admin-model">
-        <div className="a-mo-content">
-
-          <div className="a-hed">
-            <h2>Welcome to Your Dashboard</h2>
-          </div>
-
-          <button id="a-model-btn">
-            Book Appointment
-          </button>
-
-          <button id="a-model-btn">
-            My Appointments
-          </button>
-
-          <button id="a-model-btn">
-            Medical Reports
-          </button>
-
-        </div>
-      </div>
+     
+     
 
     </section>
   );

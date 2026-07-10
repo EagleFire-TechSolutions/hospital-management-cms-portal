@@ -379,26 +379,44 @@ console.log("UPDATED DOC:", appointments);
 
  //update reports by doctors for patients//
 
- const uploadRports = async (req , res) => {
-    try{
-        const {id} = req.params;
-        const {reports} = req.body;
+ const updateReport = async (req, res) => {
+  console.log("=== updateReport called ===");
+  console.log("Appointment ID:", req.params.id);
 
-        const updatedreports = await Appointment.findByIdAndUpdate(
-            id,
-            {reports},
-            {returnDocument : "after"}
-        
-        ) 
-         res.status(200).json({
-            message : "reports updaated successfully",
-            updatedreports
-        });
-    }catch(err){
-      console.log(err);
-      message : err.message,
-      success = false
+  try {
+    
+    const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
     }
- }
 
- export {getDoctorAppointments , updateStatus , uploadRports , AllDoctors};
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No report uploaded.",
+      });
+    }
+
+    appointment.report = req.file.filename;
+
+    await appointment.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Report uploaded successfully",
+      report: req.file.filename,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+ export {getDoctorAppointments , updateStatus , updateReport , AllDoctors};

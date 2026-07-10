@@ -39,6 +39,10 @@ const appointmentSchema = new mongoose.Schema({
          type  :String,
          enum: ["pending", "approved", "rejected"],
     default: "pending"
+    },
+    report : {
+        type : String,
+        default : ""
     }
 },
     {timestamps:true});

@@ -7,7 +7,7 @@ interface Report {
   doctorId?: {
     name: string;
   };
-  reports: string;
+  report: string;
   date: string;
 }
 
@@ -58,14 +58,21 @@ export default function MyReports() {
                 </h3>
 
                 <p>
-                  Report:{" "}
-                  {report.reports || "No Report Uploaded"}
-                </p>
-
-                <p>
                   Date:{" "}
                   {new Date(report.date).toLocaleDateString()}
                 </p>
+
+                {report.report ? (
+                  <a
+                    href={`http://localhost:2000/uploads/${report.report}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Report
+                  </a>
+                ) : (
+                  <p className="p1">No Report Uploaded</p>
+                )}
               </div>
             ))
           )}

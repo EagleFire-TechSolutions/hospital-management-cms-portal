@@ -16,7 +16,7 @@ interface Appointment {
 
 export default function DoctorDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [reports, setReports] = useState<{ [key: string]: string }>({});
+  const [reports, setReports] = useState<{ [key: string]: File | null }>({});
 
   useEffect(() => {
     loadAppointments();
@@ -52,20 +52,39 @@ export default function DoctorDashboard() {
     loadAppointments();
   };
 
-  const updateReport = async (id: string) => {
-    await fetch("http://localhost:2000/api/appointments/reports", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id,
-        reports: reports[id],
-      }),
-    });
+ const updateReport = async (id: string) => {
+  const file = reports[id];
 
-    loadAppointments();
-  };
+  if (!file) {
+    alert("Please select a report first.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("report", file);
+
+  try {
+    const response = await fetch(
+      `http://localhost:2000/api/doctors/upload-report/${id}`, 
+      {
+        method: "PUT",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+
+
+    if (data.success) {
+      alert("Report uploaded successfully.");
+      loadAppointments();
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <>
@@ -124,17 +143,20 @@ export default function DoctorDashboard() {
 
                   <br />
 
-                  <input
-                    type="text"
-                    placeholder="Report"
-                    value={reports[app._id] || ""}
-                    onChange={(e) =>
-                      setReports({
-                        ...reports,
-                        [app._id]: e.target.value,
-                      })
-                    }
-                  />
+                 <input
+  type="file"
+  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      setReports({
+        ...reports,
+        [app._id]: file,
+      });
+    }
+  }}
+/>
 
                   <button
                     onClick={() =>

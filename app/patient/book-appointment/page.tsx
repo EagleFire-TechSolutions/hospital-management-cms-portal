@@ -91,11 +91,7 @@ export default function BookAppointment() {
   return (
     <>
       <div id="book">
-        <img
-          className="img-b"
-          src="/b.webp"
-          alt="Book Appointment"
-        />
+      
       </div>
 
       <div id="book-appointment">

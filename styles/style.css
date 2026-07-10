@@ -129,8 +129,250 @@ td button{
   padding:20px;
   box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
+#My-Reports{
+  width:95%;
+  margin:40px auto;
+  padding:20px;
+}
+
+.hed{
+  text-align:center;
+}
+
+.hed h1{
+  color:#0b4f8a;
+  margin-bottom:20px;
+}
 .card h3{margin-bottom:10px}
-.card p{margin:8px 0}
+.card p{
+  margin:8px 0;
+
+}
+.card a{
+  background-color:#0b4f8a;
+  color:#fff;
+  padding:4px 8px;
+  border-radius:20px;
+  text-decoration:none;
+}
+.p1{
+   background-color:#0b4f8a;
+  color:#fff;
+  padding:4px 1px;
+  border-radius:20px;
+  text-decoration:none;
+}
+/* ============================
+   My Appointments Page
+============================ */
+
+#container{
+  width:95%;
+  margin:40px auto;
+  padding:20px;
+}
+
+#container h1{
+  text-align:center;
+  color:#0b4f8a;
+  margin-bottom:25px;
+}
+
+#appointments-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+}
+
+#appointments-container .card{
+  background:#fff;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+#appointments-container .card h3{
+  color:#0b4f8a;
+  margin-bottom:12px;
+}
+
+#appointments-container .card p{
+  margin:8px 0;
+  color:#333;
+ 
+}
+/* Appointment Status */
+
+.status{
+  display:inline-block;
+  margin-left:8px;
+  padding:5px 12px;
+  border-radius:20px;
+  font-size:14px;
+  font-weight:bold;
+  color:#fff;
+  text-transform:capitalize;
+}
+
+/* Pending */
+.status.pending{
+  background:#f39c12;
+}
+
+/* Approved */
+.status.approved{
+  background:#28a745;
+}
+
+/* Rejected */
+.status.rejected{
+  background:#dc3545;
+}
+
+/* ===========================
+   Doctor Dashboard
+=========================== */
+
+h1{
+  text-align:center;
+  margin:30px 0;
+  color:#0b4f8a;
+}
+
+.table-container{
+  width:95%;
+  margin:30px auto;
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+}
+
+th{
+  background:#0b4f8a;
+  color:#fff;
+}
+
+th,
+td{
+  padding:14px;
+  border:1px solid #ddd;
+  text-align:center;
+  vertical-align:middle;
+}
+
+td button{
+  margin:4px;
+}
+
+/* File Input */
+
+input[type="file"]{
+  width:100%;
+  margin:10px 0;
+  padding:6px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  background:#fff;
+}
+
+/* Upload Button */
+
+td button:last-child{
+  background:#198754;
+}
+
+td button:last-child:hover{
+  background:#146c43;
+}
+
+/* Status Colors */
+
+.status{
+  display:inline-block;
+  padding:5px 12px;
+  border-radius:20px;
+  color:#fff;
+  font-weight:bold;
+  text-transform:capitalize;
+}
+
+.status.pending{
+  background:#f39c12;
+}
+
+.status.approved{
+  background:#28a745;
+}
+
+.status.rejected{
+  background:#dc3545;
+}
+
+.status.completed{
+  background:#0d6efd;
+}
+
+/* Responsive */
+
+@media (max-width:768px){
+
+  .table-container{
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    margin:20px auto;
+  }
+
+  table{
+    width:100%;
+    min-width:700px;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+
+  th,
+  td{
+    padding:8px 6px;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  td button{
+    display:block;
+    width:100%;
+    font-size:11px;
+    padding:6px;
+    margin:4px 0;
+  }
+
+  input[type="file"]{
+    width:150px;
+    font-size:10px;
+    padding:4px;
+  }
+
+  h1{
+    font-size:24px;
+  }
+
+}
+/*next*/
+
+@media(max-width:768px){
+  #container{
+    width:100%;
+    padding:15px;
+  }
+
+  #appointments-container{
+    grid-template-columns:1fr;
+  }
+}
+
 @media(max-width:768px){
   .book-form{grid-template-columns:1fr}
   .pa-mo-content,.do-mo-content,.a-mo-content{

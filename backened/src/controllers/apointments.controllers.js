@@ -90,25 +90,41 @@ const getAppointment = async (req, res) => {
 
 //--get reports--//
 
-const getReports = async (req, res) => {
+
+
+const updateReport = async (req, res) => {
   try {
-    const reports = await Appointment.find({
-      patientId: req.patient._id,
-    }).populate("doctorId", "name specialization");
+    const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No report uploaded.",
+      });
+    }
+
+    appointment.report = req.file.filename;
+
+    await appointment.save();
 
     res.status(200).json({
-      message: "Here are your reports",
       success: true,
-      reports,
+      message: "Report uploaded successfully",
+      report: req.file.filename,
     });
-  } catch (err) {
-    console.log(err);
 
+  } catch (error) {
     res.status(500).json({
-      message: "Error getting your reports",
       success: false,
+      message: error.message,
     });
   }
 };
-
-export { bookAppointments, getAppointment, getReports };
+export { bookAppointments, getAppointment, updateReport };
