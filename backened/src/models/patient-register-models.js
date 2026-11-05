@@ -43,7 +43,8 @@ const patientRegisterSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ["doctor", "patient"]
+    enum: [ "patient"],
+    default : "patient",
   },
 
   // isActive: {
@@ -56,4 +57,4 @@ const patientRegisterSchema = new mongoose.Schema({
 
   { timestamps: true });
 
-export const patientRegister = mongoose.model("PatientRegister", patientRegisterSchema);    
+export const patientRegister = mongoose.model("PatientRegister", patientRegisterSchema);

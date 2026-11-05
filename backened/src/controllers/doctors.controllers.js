@@ -3,13 +3,21 @@ import {Doctor} from "../models/doctors.models.js";
 import { Appointment } from "../models/appointment-patient.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import  ApiErrors  from "../utils/ApiErrors.js";
 import { generatedoctorAccessTokens, generatedoctorRefreshTokens } from "../services/doctor-token.services.js";
-
+import { v2 as cloudinary} from "cloudinary";
+import path from "path";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 //---------------- REGISTER ----------------//
 const doctorRegister = async (req, res) => {
   try {
     console.log("POSTMAN BODY:", req.body);
-    const { name, email, password , role  , specialization , contact} = req.body;
+    const { name, email, password , role  ,department ,  specialization , contact} = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -28,16 +36,21 @@ const doctorRegister = async (req, res) => {
     const existingemail = await Doctor.findOne({ email:email.toLowerCase() });
     if (existingemail) {
       throw new ApiErrors("Email already exists");
+      // return res.status(409).json({
+      //   success : false,
+      //   message : "Email already exist"
+      // })
     }
 
     const hashpassword = await bcrypt.hash(password, 10);
 
     const doctorCreate = await Doctor.create({
-     
+
       name,
       email:email.toLowerCase(),
       password: hashpassword,
       specialization,
+      department,
       contact,
       role:"doctor"
     });
@@ -52,6 +65,7 @@ const doctorRegister = async (req, res) => {
         name: doctorCreate.name,
         role: doctorCreate.role,
         specialization: doctorCreate.specialization,
+        department : doctorCreate.department,
         contact: doctorCreate.contact,
         email: doctorCreate.email,
       }
@@ -142,7 +156,7 @@ const AccessTokens = jwt.sign(
     });
   }
 
-    
+
 
     //-------- TOKEN + SESSION LOGIC --------//
   try {
@@ -197,7 +211,7 @@ const AccessTokens = jwt.sign(
 
 //---------------- REFRESH TOKEN ----------------//
 const refreshdoctorAccessTokens = async (req, res) => {
- 
+
   const tokens = req.cookies.RefreshTokens;
 
   if (!tokens) {
@@ -223,7 +237,7 @@ const refreshdoctorAccessTokens = async (req, res) => {
   if (!doctor || !doctor.isActive) {
     throw new ApiErrors(401, "doctor not found");
   }
-  
+
 
   const newAccessTokens = generatedoctorAccessTokens(doctor);
   const newRefreshTokens = generatedoctorRefreshTokens(doctor, session._id.toString());
@@ -244,7 +258,7 @@ const refreshdoctorAccessTokens = async (req, res) => {
     }
   });
 };
-  
+
 //---------------- CURRENT PATIENT ----------------//
 const getCurrentDoctor = async (req, res) => {
   res.status(200).json({
@@ -255,7 +269,7 @@ const getCurrentDoctor = async (req, res) => {
       email: req.doctor.email,
       specialization: req.doctor.specialization,
       contact: req.doctor.contact,
-     
+
       role: req.doctor.role,
     }
   });
@@ -263,10 +277,10 @@ const getCurrentDoctor = async (req, res) => {
 
 //---------------- LOGOUT ----------------//
 const logoutDoctor = async (req, res) => {
- 
-  
+
+
   const tokens = req.cookies.RefreshTokens;
-   console.log("COOKIES:", req.cookies);  
+   console.log("COOKIES:", req.cookies);
   console.log("TOKEN:", tokens);
 console.log("log hots");
 
@@ -311,7 +325,7 @@ res.status(200).json({
 //getting all appointments//
 const getDoctorAppointments = async (req , res) => {
     try{
- const { doctorId } = req.params;
+ const  doctorId  = req.doctor._id;
  console.log("Doctor Id from params:" , doctorId);
  if (!doctorId){
   return res.status(400).json({
@@ -344,7 +358,7 @@ console.log("APPOINTMENTS FOR DOCTOR ID:", doctorId, appointments);
      res.status(500).json({
         message : err.message,
         success : false
-     });        
+     });
     };
 };
 
@@ -382,18 +396,54 @@ console.log("UPDATED DOC:", appointments);
  const updateReport = async (req, res) => {
   console.log("=== updateReport called ===");
   console.log("Appointment ID:", req.params.id);
+  console.log("Doctor ID:", req.doctor?._id);
 
   try {
-    
-    const appointment = await Appointment.findById(req.params.id);
+    const appointmentId = req.params.id;
+    const doctorId = req.doctor?._id;
+
+    // 1. Make sure the doctor is authenticated
+    if (!doctorId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. Doctor authentication required.",
+      });
+    }
+
+    // 2. Validate appointment ID
+    if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid appointment ID.",
+      });
+    }
+
+    // 3. Find the appointment
+    const appointment = await Appointment.findById(appointmentId);
 
     if (!appointment) {
       return res.status(404).json({
         success: false,
-        message: "Appointment not found",
+        message: "Appointment not found.",
       });
     }
 
+    // 4. OWNERSHIP CHECK
+    // Only the doctor who owns this appointment can upload its report
+    if (appointment.doctorId.toString() !== doctorId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to upload a report for this appointment.",
+      });
+    }
+    if (appointment.status === "rejected") {
+  return res.status(400).json({
+    success: false,
+    message: "Cannot upload a report for a rejected appointment.",
+  });
+};
+
+    // 5. Make sure a file was uploaded
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -401,22 +451,78 @@ console.log("UPDATED DOC:", appointments);
       });
     }
 
-    appointment.report = req.file.filename;
+    // 6. Upload report to cloudinary
+   const result = await new Promise((resolve, reject) => {
+  const stream = cloudinary.uploader.upload_stream(
+    {
+      folder: "hms/reports",
+      resource_type: "raw",
+      type: "authenticated",
+    },
+    (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    }
+  );
 
-    await appointment.save();
+  stream.end(req.file.buffer);
+});
+    console.log("CLOUDINARY RESULT:", result);
 
-    res.status(200).json({
-      success: true,
-      message: "Report uploaded successfully",
-      report: req.file.filename,
+    //7.Save clooudinary files to mongodb
+
+   // 7. Save Cloudinary file information to MongoDB
+try {
+  const fileExtension = path.extname(req.file.originalname).toLowerCase();
+
+  appointment.reportPublicId = result.public_id;
+  appointment.reportFormat = fileExtension;
+
+  await appointment.save();
+
+  console.log("REPORT SAVED TO MONGODB:", appointment.reportPublicId);
+  console.log("REPORT FORMAT:", appointment.reportFormat);
+
+} catch (dbError) {
+  console.error("MongoDB report save error:", dbError);
+
+  try {
+    await cloudinary.uploader.destroy(result.public_id, {
+      resource_type: "raw",
+      type: "authenticated",
     });
 
-  } catch (error) {
-    res.status(500).json({
+    console.log("Cloudinary report cleaned up successfully.");
+  } catch (cloudinaryError) {
+    console.error("Cloudinary cleanup failed:", cloudinaryError);
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Failed to save report information.",
+  });
+}
+    //8.Remove temporary local file
+    // fs.unlikeSync(req.file.path);
+
+    //9.suuccess return message
+    return res.status(201).json({
+      message : "Report uploaded successfully",
+      success : true,
+      report : result.public_id
+    });
+  }
+
+    catch (error) {
+    console.error("Report upload error:", error);
+
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to upload report.",
     });
   }
 };
-
  export {getDoctorAppointments , updateStatus , updateReport , AllDoctors};

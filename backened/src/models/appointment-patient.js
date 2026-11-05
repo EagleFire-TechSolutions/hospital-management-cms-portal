@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const appointmentSchema = new mongoose.Schema({
     patientId : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : "PatientRegister"
+        ref : "PatientRegister",
+        required : true
     },
     name : {
          type  :String,
@@ -15,7 +16,8 @@ const appointmentSchema = new mongoose.Schema({
     },
     gender : {
           type  :String,
-        required : true
+        required : true,
+        enum : ["Male" , "Female"]
     },
 
  doctorId: {
@@ -37,14 +39,22 @@ const appointmentSchema = new mongoose.Schema({
     },
     status : {
          type  :String,
-         enum: ["pending", "approved", "rejected"],
+         enum: ["pending", "approved", "rejected" , "completed"],
     default: "pending"
     },
     report : {
         type : String,
         default : ""
-    }
+    },
+    reportPublicId: {
+        type : String,
+        default : ""
+    },
+   reportFormat: {
+  type: String,
+  default: ""
+},
 },
     {timestamps:true});
 
- export const Appointment = mongoose.model("Appointment" , appointmentSchema);    
+ export const Appointment = mongoose.model("Appointment" , appointmentSchema);

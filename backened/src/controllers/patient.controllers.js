@@ -26,16 +26,20 @@ const patientregister = async (req, res) => {
       });
     }
 
-    const existingemail = await patientRegister.findOne({ email });
+    const existingemail = await patientRegister.findOne({ email:email.toLowerCase() });
     if (existingemail) {
-      throw new ApiErrors("Email already exists");
+      // throw new ApiErrors("Email already exists");
+      return res.status(409).json({
+        success : false,
+        message : "Email already exists"
+      })
     }
 
     const hashpassword = await bcrypt.hash(password, 10);
 
     const patientCreate = await patientRegister.create({
       name,
-      email,
+      email: email.toLowerCase(),
       password: hashpassword,
       role: "patient",
     });
@@ -46,20 +50,20 @@ const patientregister = async (req, res) => {
       message: "Patient created",
       success: true,
       data: {
-        
+
           id: patientCreate._id,
           name: patientCreate.name,
           role: patientCreate.role,
           email: patientCreate.email,
           token: patientCreate.token
-        
+
       }
     });
 
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Internal server error",
+      message: err.message || "Internal server error",
       success: false
     });
   }
@@ -94,7 +98,7 @@ const patientLogin = async (req, res) => {
       throw new ApiErrors(401, "Invalid email or password");
     }
 
-    // ✅ FIXED: ONLY ONE TOKEN METHOD
+    //  FIXED: ONLY ONE TOKEN METHOD
     const AccessTokens = generatepatientAccessTokens(patient);
 
     //-------- TOKEN + SESSION LOGIC --------//
@@ -128,12 +132,12 @@ const patientLogin = async (req, res) => {
       success: true,
       data: {
         AccessTokens,
-        
+
           id: patient._id,
           name: patient.name,
           email: patient.email,
           role: patient.role
-        
+
       }
     });
 

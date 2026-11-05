@@ -1,23 +1,85 @@
-import {getDoctorAppointments , updateStatus , updateReport , AllDoctors} from "../controllers/doctors.controllers.js";
 import express from "express";
-import {doctorLogin, doctorRegister ,
 
- logoutDoctor ,
- getCurrentDoctor } from "../controllers/doctors.controllers.js";
- import upload from "../middlewares/reportupload.js";
+import {
+  getDoctorAppointments,
+  updateStatus,
+  updateReport,
+  AllDoctors,
+  doctorLogin,
+  doctorRegister,
+  logoutDoctor,
+  getCurrentDoctor,
+} from "../controllers/doctors.controllers.js";
+
+import {
+  doctorAuthHeader,
+  validatedoctorLogin,
+  validatedoctorRegister,
+} from "../middlewares/doctor_validation.js";
+
+import upload from "../middlewares/reportupload.js";
 
 const doctorrouter = express.Router();
 
+/* =========================
+   PUBLIC ROUTES
+========================= */
+
+// Get all doctors
 doctorrouter.get("/AllDoctors", AllDoctors);
 
-doctorrouter.put("/status",updateStatus);
-doctorrouter.post("/login" , doctorLogin);
-doctorrouter.post("/register" , doctorRegister);
+// Doctor login
+doctorrouter.post(
+  "/login",
+  validatedoctorLogin,
+  doctorLogin
+);
+
+// Doctor registration
+doctorrouter.post(
+  "/register",
+  validatedoctorRegister,
+  doctorRegister
+);
+
+
+/* =========================
+   PROTECTED ROUTES
+========================= */
+
+// Current logged-in doctor
+doctorrouter.get(
+  "/me",
+  doctorAuthHeader,
+  getCurrentDoctor
+);
+
+// Doctor appointments
+doctorrouter.get(
+  "/appointments",
+  doctorAuthHeader,
+  getDoctorAppointments
+);
+
+// Update appointment status
+doctorrouter.put(
+  "/status",
+  doctorAuthHeader,
+  updateStatus
+);
+
+// Upload patient report
 doctorrouter.put(
   "/upload-report/:id",
+  doctorAuthHeader,
   upload.single("report"),
   updateReport
 );
-doctorrouter.get("/:doctorId", getDoctorAppointments);
-doctorrouter.post("/Alldoctors", AllDoctors);
+
+// Logout
+doctorrouter.post(
+  "/logout",
+  logoutDoctor
+);
+
 export { doctorrouter };
